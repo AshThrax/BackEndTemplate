@@ -7,7 +7,12 @@ namespace templateapi.Repository
 {
     public class Repository<T> : IRepository<T> where T:class
     {
-         /// <summary>
+        private readonly ApplicationDbContext _context;
+        public Repository(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+        /// <summary>
         /// get all entities
         /// </summary>
         /// <returns></returns>
@@ -15,11 +20,14 @@ namespace templateapi.Repository
         {
             try
             {
-
+                return _context.Set<T>()
+                                .Skip((page -1) * pageSize)
+                               .Take(pageSize)
+                               .ToListAsync();
             }
             catch(Exception ex)
             {
-
+                throw new Exception(ex.Message);    
             }
         }
         /// <summary>
@@ -33,11 +41,18 @@ namespace templateapi.Repository
           {
             try
             {
-
+                IQueryable<T> query = _context.Set<T>();
+                if(predicate == null)
+                {
+                    query.where(predicate);
+                }
+               return query.Skip((page -1) * pageSize)
+                           .Take(pageSize)
+                           .ToListAsync();
             }
             catch(Exception ex)
             {
-                
+                throw ex;
             }
         }
         /// <summary>
@@ -49,11 +64,11 @@ namespace templateapi.Repository
         {
             try
             {
-
+                return _context.Set<T>().Find(id);
             }
             catch(Exception ex)
             {
-                
+                throw ex;
             }
         }
         /// <summary>
@@ -65,7 +80,12 @@ namespace templateapi.Repository
         {
             try
             {
-
+                IQueryable<T> query = _context.Set<T>();
+                if(predicate == null)
+                {
+                    query.where(predicate);
+                }
+               return query.FirstOrDefault();
             }
             catch(Exception ex)
             {
@@ -81,52 +101,61 @@ namespace templateapi.Repository
         {
             try
             {
-
+                T EntityToremove = _context.Set<T>().Find(id);
+                if(remove != null)
+                {
+                    _context.remove(EntityToremove);
+                }
             }
             catch(Exception ex)
             {
-                
+                throw ;
             }
         }
-        public T AddAsync()
+        /// <summary>
+        /// add data of type t 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<T> AddAsync(T entity)
         {
             try
             {
-
+                _context.Set<T>().Add(entity);
+            
             }
             catch(Exception ex)
             {
-                
+                throw;
             }
         }
         /// <summary>
         /// update data 
         /// </summary>
         /// <returns></returns>
-        public T UpdateAsync()
+        public async Task<T> UpdateAsync(T entity)
         {
             try
             {
-
+                _context.Entry(entity).State = EntityState.Modified;
             }
             catch(Exception ex)
             {
-                
+                throw;
             }
         }
         /// <summary>
         /// proceed to a save int the database
         /// </summary>
         /// <returns></returns>
-        public Task<int> Save()
+        public async Task<int> Save()
         {
             try
             {
-
+                return -_context.SaveChangesAsync();
             }
             catch(Exception ex)
             {
-                
+                throw;
             }
         }
         /// <summary>
@@ -134,15 +163,20 @@ namespace templateapi.Repository
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public Task<T> SelecteAsync(Expression<Func<T,bool>> predicate)
+        publicb async Task<T> SelecteAsync(Expression<Func<T,bool>> predicate)
         {
             try
             {
-
+                IQueryable<T> query = _context.Set<T>();
+                if(predicate == null)
+                {
+                    query.where(predicate);
+                }
+                return query.ToListAsync();
             }
             catch(Exception ex)
             {
-                
+                throw;
             }
         }
     }

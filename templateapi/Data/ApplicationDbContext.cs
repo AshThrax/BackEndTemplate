@@ -5,8 +5,20 @@ using System.Threading.Tasks;
 
 namespace templateapi.Data
 {
-    public class ApplicationDbContext
+    public class ApplicationDbContext: DbContext
     {
-        
+        public ApplicationDbContext (DbContextOptions<ApplicationDbContext> options): base(options)
+        {
+
+        }
+
+        /// <summary>
+        /// Configuration for DbContext 
+        /// </summary>
+        /// <param name="model"></param>
+        protected override void OnModelCreating (ModelBuilder model)
+        {
+            
+        }
     }
 }

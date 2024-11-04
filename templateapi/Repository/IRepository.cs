@@ -38,12 +38,12 @@ namespace templateapi.Repository
          /// <param name="id"></param>
          /// <returns></returns>
         bool Remove(int id);
-        T AddAsync();
+        Task<T> AddAsync(T entity);
         /// <summary>
         /// update data 
         /// </summary>
         /// <returns></returns>
-        T UpdateAsync();
+        Task<T> UpdateAsync(T entity);
         /// <summary>
         /// save database
         /// </summary>
